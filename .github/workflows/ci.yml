@@ -128,6 +128,8 @@ jobs:
           MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
           MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
         run: |
+          echo "MAIL_USERNAME: $MAIL_USERNAME"
+          echo "MAIL_PASSWORD: $MAIL_PASSWORD"
           echo "Launching Spring Boot app (test profile)..."
           timeout 75s bash -c '
             java -jar target/*.jar --spring.profiles.active=test &
