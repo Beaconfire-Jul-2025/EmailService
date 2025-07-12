@@ -22,5 +22,9 @@ spring:
       mail.smtp.auth: true
       mail.smtp.starttls.enable: true
 
+eureka:
+  client:
+    enabled: false
+
 server:
   port: 8085
