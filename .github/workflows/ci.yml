@@ -76,6 +76,8 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     needs: build-and-test
+    permissions:
+      contents: read
     services:
       rabbitmq:
         image: rabbitmq:3-management
