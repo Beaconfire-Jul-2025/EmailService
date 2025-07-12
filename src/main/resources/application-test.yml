@@ -4,7 +4,7 @@ spring:
       discovery:
         enabled: false
   config:
-    import: ""
+    import: optional:file:./config/,optional:classpath:/config/
   rabbitmq:
     host: localhost
     port: 5672
