@@ -76,24 +76,6 @@ jobs:
   health-check:
     runs-on: ubuntu-latest
     needs: build-and-test
-    permissions:
-      contents: read
-    services:
-      rabbitmq:
-        image: rabbitmq:3-management
-        ports:
-          - 5672:5672
-          - 15672:15672
-        options: >-
-          --health-cmd "rabbitmq-diagnostics -q ping"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
-          --name rabbitmq
-          -v ${{ github.workspace }}/.rmq/definitions.json:/etc/rabbitmq/definitions.json
-          -e RABBITMQ_LOAD_DEFINITIONS=/etc/rabbitmq/definitions.json
-          -e RABBITMQ_DEFAULT_USER=guest
-          -e RABBITMQ_DEFAULT_PASS=guest
 
     steps:
       - name: Checkout Code
@@ -104,6 +86,36 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '8'
+
+      - name: Start RabbitMQ with definitions.json
+        run: |
+          docker run -d \
+            --name rabbitmq \
+            -p 5672:5672 -p 15672:15672 \
+            -e RABBITMQ_LOAD_DEFINITIONS=/etc/rabbitmq/definitions.json \
+            -e RABBITMQ_DEFAULT_USER=guest \
+            -e RABBITMQ_DEFAULT_PASS=guest \
+            rabbitmq:3-management
+
+          echo "Waiting for RabbitMQ container to become healthy..."
+          sleep 10
+
+          echo "Copying definitions.json into container..."
+          docker cp .rmq/definitions.json rabbitmq:/etc/rabbitmq/definitions.json
+
+          echo "Restarting container to apply definitions..."
+          docker restart rabbitmq
+
+          echo "Waiting for RabbitMQ to be ready..."
+          for i in {1..10}; do
+            sleep 5
+            if docker exec rabbitmq rabbitmq-diagnostics -q ping; then
+              echo "✅ RabbitMQ is healthy"
+              break
+            else
+              echo "Waiting on RabbitMQ ($i)..."
+            fi
+          done
 
       - name: Download Built JAR
         uses: actions/download-artifact@v4
