@@ -124,6 +124,9 @@ jobs:
           path: target
 
       - name: Run Spring Boot App with test profile and check health
+        env:
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
         run: |
           echo "Launching Spring Boot app (test profile)..."
           timeout 75s bash -c '
