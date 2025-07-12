@@ -1,0 +1,79 @@
+{
+  "rabbit_version": "4.1.2",
+  "rabbitmq_version": "4.1.2",
+  "product_name": "RabbitMQ",
+  "product_version": "4.1.2",
+  "rabbitmq_definition_format": "cluster",
+  "original_cluster_name": "rabbit@BeaconFireHRJul2025",
+  "explanation": "Definitions of cluster 'rabbit@BeaconFireHRJul2025'",
+  "users": [
+    {
+      "name": "guest",
+      "password_hash": "fn+ebIxFgzwYBk6hJnKnRrip0YA2ofwh0+JtIAoDgQkYxooM",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": ["administrator"],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "/",
+      "description": "Default virtual host",
+      "metadata": {
+        "description": "Default virtual host",
+        "tags": [],
+        "default_queue_type": "classic"
+      },
+      "tags": []
+    }
+  ],
+  "permissions": [
+    {
+      "user": "guest",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    { "name": "cluster_tags", "value": [] },
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-Uvf-Q3PgxZxZ9alhE2zmsA"
+    }
+  ],
+  "policies": [],
+  "queues": [
+    {
+      "name": "emailQueue",
+      "vhost": "/",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": { "x-queue-type": "classic" }
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "emailExchange",
+      "vhost": "/",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "emailExchange",
+      "vhost": "/",
+      "destination": "emailQueue",
+      "destination_type": "queue",
+      "routing_key": "sendEmail",
+      "arguments": {}
+    }
+  ]
+}
