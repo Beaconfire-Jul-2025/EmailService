@@ -84,9 +84,14 @@ jobs:
           - 15672:15672
         options: >-
           --health-cmd "rabbitmq-diagnostics -q ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+          --name rabbitmq
+          -v ${{ github.workspace }}/.rmq/definitions.json:/etc/rabbitmq/definitions.json
+          -e RABBITMQ_LOAD_DEFINITIONS=/etc/rabbitmq/definitions.json
+          -e RABBITMQ_DEFAULT_USER=guest
+          -e RABBITMQ_DEFAULT_PASS=guest
 
     steps:
       - name: Checkout Code
@@ -104,27 +109,29 @@ jobs:
           name: app-jar
           path: target
 
-      - name: Run Spring Boot App and Test Actuator Health
-        env:
-          SPRING_PROFILES_ACTIVE: test
+      - name: Run Spring Boot App with test profile and check health
         run: |
-          echo "Starting Spring Boot app..."
-          java -jar target/*.jar &
-          APP_PID=$!
+          echo "Launching Spring Boot app (test profile)..."
+          timeout 75s bash -c '
+            java -jar target/*.jar --spring.profiles.active=test &
+            APP_PID=$!
 
-          echo "Waiting for app to start..."
-          for i in {1..15}; do
-            sleep 5
-            if curl -s http://localhost:8085/actuator/health | grep '"status":"UP"' > /dev/null; then
-              echo "✅ Actuator is UP"
-              kill $APP_PID
-              exit 0
-            else
-              echo "Waiting for actuator..."
-            fi
-          done
+            echo "Waiting for actuator to respond..."
 
-          echo "❌ Actuator health check failed"
-          kill $APP_PID
-          exit 1
+            for i in {1..15}; do
+              sleep 5
+              if curl -s http://localhost:8085/actuator/health | grep "\"status\":\"UP\"" > /dev/null; then
+                echo "✅ Actuator is UP"
+                kill $APP_PID
+                exit 0
+              else
+                echo "Still waiting ($i)..."
+              fi
+            done
+
+            echo "❌ Actuator health check failed"
+            kill $APP_PID
+            exit 1
+          '
+  
 
