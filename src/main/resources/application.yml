@@ -1,12 +1,5 @@
 spring:
   application:
     name: email
-  profiles:
-    active: dev
   config:
     import: configserver:http://localhost:8888
-logging:
-  level:
-    org.springframework.cloud.config.server.environment: DEBUG
-    org.springframework.cloud.config.client: DEBUG
-    org.springframework.boot.context.config: DEBUG
