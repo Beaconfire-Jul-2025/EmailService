@@ -1,21 +1,19 @@
 package org.beaconfire.email.service;
 
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.beaconfire.email.model.EmailMessage;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
+@AllArgsConstructor
 public class EmailConsumer {
 
   private final JavaMailSender mailSender;
-
-  @Autowired
-  public EmailConsumer(JavaMailSender mailSender) {
-    this.mailSender = mailSender;
-  }
 
   @RabbitListener(queues = "emailQueue")
   public void receiveEmail(EmailMessage emailMessage) {
