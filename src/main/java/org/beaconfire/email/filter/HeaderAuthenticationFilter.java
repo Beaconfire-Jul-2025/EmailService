@@ -15,6 +15,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Slf4j
 public class HeaderAuthenticationFilter extends OncePerRequestFilter {
   @Override
+  protected boolean shouldNotFilter(javax.servlet.http.HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.startsWith("/actuator/");
+  }
+
+  @Override
   protected void doFilterInternal(
       javax.servlet.http.HttpServletRequest request,
       javax.servlet.http.HttpServletResponse response,
